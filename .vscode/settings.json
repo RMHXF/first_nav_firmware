@@ -1,0 +1,7 @@
+{
+    "C_Cpp.errorSquiggles": "enabled",
+    "makefile.makefilePath": "",
+    "makefile.makePath": "",
+    "makefile.configureOnOpen": true,
+    "cortex-debug.variableUseNaturalFormat": false
+}

@@ -1,0 +1,12 @@
+# Build output
+build/
+
+# Local Claude Code config
+.claude/
+
+# CMSIS DSP precompiled libraries (not used by this project)
+Drivers/CMSIS/DSP/
+
+# OS
+.DS_Store
+Thumbs.db

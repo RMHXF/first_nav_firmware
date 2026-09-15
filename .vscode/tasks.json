@@ -1,0 +1,26 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Download",
+			"type": "shell",
+			"command": "openocd",
+			"args": [
+				"-f",
+				"D:/ROBOMASTER_27/EC_env/OpenOCD-20260302-0.12.0/share/openocd/scripts/interface/cmsis-dap.cfg",
+				"-f", //选择下载器
+				"D:/ROBOMASTER_27/EC_env/OpenOCD-20260302-0.12.0/share/openocd/scripts/target/stm32h7x.cfg",
+				"-c", //选择芯片型号
+				"program build/RM_Infantry.hex verify reset exit"
+				//build文件夹下的XXX.hex文件
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+                "kind": "build",
+                "isDefault": true
+            }
+		}
+	]
+}
