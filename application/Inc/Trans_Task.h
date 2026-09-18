@@ -67,4 +67,5 @@ void chassis_motor_enable(void);
 void chassis_motor_disable(void);
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size);
 void ctrl_dm_motor(void);
+void MiniPC_Data_Read(uint8_t *buf,ReceivePacket_t *Rx_miniPC);
 #endif

@@ -1,5 +1,6 @@
 #include "Trans_Task.h"
 #include "CRC_Check.h"
+#include "string.h"
 extern DMA_HandleTypeDef hdma_uart5_rx;
 extern UART_HandleTypeDef huart5;
 
@@ -95,5 +96,19 @@ void ctrl_dm_motor(void)
 void MiniPC_Data_Read(uint8_t *buf,ReceivePacket_t *Rx_miniPC)
 {
     if(buf == NULL) return;
-
+    if(buf[0] == MINIPC_RECV_HEADER)
+    {
+        ReceivePacket_t RX_miniPC_Data_temp;
+        memcpy(&RX_miniPC_Data_temp,buf,RX_MINIPC_DATA_LEN);
+        uint16_t checksum;
+        checksum = RX_miniPC_Data_temp.checksum;
+        if(Verify_CRC16_Check_Sum(buf,RX_MINIPC_DATA_LEN) == checksum)
+        {
+            memcpy(&Rx_miniPC,buf,RX_MINIPC_DATA_LEN);
+        }
+    }
+    if(*(buf + RX_MINIPC_DATA_LEN) == 0xA5)
+    {
+        MiniPC_Data_Read((buf + RX_MINIPC_DATA_LEN),Rx_miniPC);
+    }
 }

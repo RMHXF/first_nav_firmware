@@ -27,6 +27,22 @@ void Chassis_Init(void)
     }
 }
 
+void Ctrl_Check(void)
+{
+    if(remote_ctrl.s[0] == 0)
+    {
+         Chassis_Data.Chassis_mode = Chassis_mode_silence;
+    }else{
+         Chassis_Data.Chassis_mode = Chassis_mode_normal;
+    }
+    if(remote_ctrl.s[1] == 1)
+    {
+        Chassis_Data.ctrl_mode = SLAM;
+    }else{
+        Chassis_Data.ctrl_mode = REMOTE_CTRL;
+    }
+}
+
 void Chassis_normal_mode(float Vx, float Vy, float Wz)
 {
     Chassis_Data.motor_val[0] = -Vx - Vy - Wz;
@@ -46,7 +62,10 @@ void Chassis_Ctrl(Chassis_Data_t *Chassis_Data_p)
         Chassis_Data_p->Ctrl.Vy = remote_ctrl.ch[3] / 50;
         Chassis_Data_p->Ctrl.Wz = remote_ctrl.ch[0] / 50;
         break;
-    
+    case SLAM:
+        Chassis_Data_p->Ctrl.Vx = Rx_miniPC.Target_V.vx;
+        Chassis_Data_p->Ctrl.Vy = Rx_miniPC.Target_V.vy;
+        Chassis_Data_p->Chassis_Wz = Rx_miniPC.Target_V.wz;
     default:
         break;
     }

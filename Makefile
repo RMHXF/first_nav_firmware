@@ -87,12 +87,12 @@ DM_bsp/src/delay.c \
 DM_bsp/src/dm_motor_ctrl.c \
 DM_bsp/src/dm_motor_drv.c \
 algorithms/Control/pid.c \
-algorithms/Filters/MahonyAHRS.c	\ \
+algorithms/Filters/MahonyAHRS.c \
 device/BMI088/Src/BMI088driver.c \
-device/BMI088/Src/BMI088Middleware.c	\ \
-application/Src/Chassis_Task.c	\ \
-application/Src/IMU_Task.c	\ \
-application/Src/Trans_Task.c	\ \
+device/BMI088/Src/BMI088Middleware.c \
+application/Src/Chassis_Task.c \
+application/Src/IMU_Task.c \
+application/Src/Trans_Task.c \
 Core/Src/memorymap.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd_ex.c \

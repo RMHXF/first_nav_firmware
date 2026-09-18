@@ -19,6 +19,7 @@ typedef enum
     REMOTE_CTRL = 0,
     KEYBOARD_MOUSE,
     CUSTOM_CONTROLLOR,
+    SLAM,
 }Chassis_ctrl_mode_t;
 
 typedef struct
@@ -48,6 +49,7 @@ extern Chassis_Data_t Chassis_Data;
 
 void Chassis_Task_main(void *argument);
 void Chassis_Init(void);
+void Ctrl_Check(void);
 void Chassis_normal_mode(float Vx, float Vy, float Wz);
 void Chassis_Ctrl(Chassis_Data_t *Chassis_Data_p);
 void Chassis_Mode_Loop(Chassis_Data_t *Chassis_Data_p);
