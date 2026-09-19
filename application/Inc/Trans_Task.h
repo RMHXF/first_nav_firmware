@@ -75,5 +75,5 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size);
 void ctrl_dm_motor(void);
 void MiniPC_Data_Read(uint8_t *buf,ReceivePacket_t *Rx_miniPC);
 void MiniPC_Data_Send_Process(SendPacket_t *Data,Velocity_t *Current_V);
-void MiniPC_Data_Transmit(SendPacket_t *Data);
+void MiniPC_Data_Transmit(const SendPacket_t *Data);
 #endif

@@ -108,12 +108,12 @@ void MiniPC_Data_Read(uint8_t *buf,ReceivePacket_t *Rx_miniPC)
         memcpy(&RX_miniPC_Data_temp,buf,RX_MINIPC_DATA_LEN);
         uint16_t checksum;
         checksum = RX_miniPC_Data_temp.checksum;
-        if(Verify_CRC16_Check_Sum(buf,RX_MINIPC_DATA_LEN) == checksum)
+        if(Verify_CRC16_Check_Sum(buf,RX_MINIPC_DATA_LEN))
         {
-            memcpy(&Rx_miniPC,buf,RX_MINIPC_DATA_LEN);
+            memcpy(Rx_miniPC,buf,RX_MINIPC_DATA_LEN);
         }
     }
-    if(*(buf + RX_MINIPC_DATA_LEN) == 0xA5)
+    if(*(buf + RX_MINIPC_DATA_LEN) == MINIPC_RECV_HEADER)
     {
         MiniPC_Data_Read((buf + RX_MINIPC_DATA_LEN),Rx_miniPC);
     }
@@ -124,15 +124,18 @@ void MiniPC_Data_Send_Process(SendPacket_t *Data,Velocity_t *Current_V)
     Data->header = MINIPC_SEND_HEADER;
     Data->timestamp = HAL_GetTick();
     Data->Current_V.vx = Current_V->vx;
+    if(fabs(Current_V->vx <= 0.01)) Current_V->vx = 0;
     Data->Current_V.vy = Current_V->vy;
+    if(fabs(Current_V->vy <= 0.01)) Current_V->vy = 0;
     Data->Current_V.wz = Current_V->wz;
+    if(fabs(Current_V->wz <= 0.01)) Current_V->wz = 0;
     Data->tail = MINIPC_SEND_TAIL;
     Data->checksum = Get_CRC16_Check_Sum((uint8_t *)Data,TX_MINIPC_DATA_LEN-2,0);
 }
 
-void MiniPC_Data_Transmit(SendPacket_t *Data)
+void MiniPC_Data_Transmit(const SendPacket_t *Data)
 {   
     uint8_t buf[TX_MINIPC_DATA_LEN] = {0};
-    memcpy(buf,&Data,TX_MINIPC_DATA_LEN);
+    memcpy(buf,Data,TX_MINIPC_DATA_LEN);
     CDC_Transmit_HS(buf,TX_MINIPC_DATA_LEN);
 }

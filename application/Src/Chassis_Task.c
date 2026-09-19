@@ -3,6 +3,7 @@
 Chassis_Data_t Chassis_Data;
 
 float temp = 0;
+int SLAM_test = 1;
 void Chassis_Task_main(void *argument)
 {
     Chassis_Init();
@@ -37,7 +38,7 @@ void Ctrl_Check(void)
     }else{
          Chassis_Data.Chassis_mode = Chassis_mode_normal;
     }
-    if(remote_ctrl.s[1] == 1)
+    if(remote_ctrl.s[1] == 1 || SLAM_test == 1)
     {
         Chassis_Data.ctrl_mode = SLAM;
     }else{
