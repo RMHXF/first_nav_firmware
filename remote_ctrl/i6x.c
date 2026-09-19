@@ -80,8 +80,8 @@ void sbus_to_i6x(i6x_ctrl_t *i6x_ctrl, const uint8_t *sbus_data)
     const uint8_t flag = sbus_data[23];
     i6x_ctrl->frame_lost = (flag >> 2) & 0x01;
     i6x_ctrl->failsafe = (flag >> 3) & 0x01;
-}
 #endif
+}
 /**
  * @brief 获取存放数据结构体指针
  * @return i6x遥控器数据结构体指针

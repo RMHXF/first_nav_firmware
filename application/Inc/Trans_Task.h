@@ -6,20 +6,26 @@
 #include "usart.h"
 #include "dma.h"
 #include "i6x.h"
+#include "usbd_cdc_if.h"
 
 #include "bsp_fdcan.h"
 #include "dm_motor_ctrl.h"
 #include "dm_motor_drv.h"
-
-#include "Chassis_Task.h"
 
 #define USART5_BUFLEN 18
 #define RX_MINIPC_DATA_LEN 32
 #define TX_MINIPC_DATA_LEN 20
 #define MINIPC_SEND_HEADER 0xA5
 #define MINIPC_RECV_HEADER 0x5A
+#define MINIPC_SEND_TAIL 0xB5
+#define MINIPC_RECV_TAIL 0x5B
 
 extern i6x_ctrl_t remote_ctrl;
+
+typedef struct
+{
+    motor_t motor[4];
+} Chassis_Motor_t;
 
 typedef struct
 {
@@ -68,4 +74,6 @@ void chassis_motor_disable(void);
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size);
 void ctrl_dm_motor(void);
 void MiniPC_Data_Read(uint8_t *buf,ReceivePacket_t *Rx_miniPC);
+void MiniPC_Data_Send_Process(SendPacket_t *Data,Velocity_t *Current_V);
+void MiniPC_Data_Transmit(SendPacket_t *Data);
 #endif

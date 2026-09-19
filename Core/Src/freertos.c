@@ -73,7 +73,7 @@ osThreadId_t imuTempCtrlHandle;
 const osThreadAttr_t imuTempCtrl_attributes = {
   .name = "imuTempCtrl",
   .stack_size = 256 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for imuBinarySem01 */
 osSemaphoreId_t imuBinarySem01Handle;

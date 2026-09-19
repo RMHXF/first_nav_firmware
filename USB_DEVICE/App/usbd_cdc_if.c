@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : usbd_cdc_if.c
-  * @version        : v1.0_Cube
-  * @brief          : Usb device for Virtual Com Port.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : usbd_cdc_if.c
+ * @version        : v1.0_Cube
+ * @brief          : Usb device for Virtual Com Port.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -49,7 +49,13 @@
   */
 
 /* USER CODE BEGIN PRIVATE_TYPES */
-
+USBD_CDC_LineCodingTypeDef USBD_CDC_LineCoding =
+    {
+        115200, /* baud rate*/
+        0x00,   /* stop bits-1*/
+        0x00,   /* parity - none*/
+        0x08    /* nb. of bits 8*/
+};
 /* USER CODE END PRIVATE_TYPES */
 
 /**
@@ -183,7 +189,7 @@ static int8_t CDC_DeInit_HS(void)
 static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
   /* USER CODE BEGIN 10 */
-  switch(cmd)
+  switch (cmd)
   {
   case CDC_SEND_ENCAPSULATED_COMMAND:
 
@@ -223,11 +229,20 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
   case CDC_SET_LINE_CODING:
-
+    USBD_CDC_LineCoding.bitrate = (pbuf[3] << 24) | (pbuf[2] << 16) | (pbuf[1] << 8) | pbuf[0];
+    USBD_CDC_LineCoding.format = pbuf[4];
+    USBD_CDC_LineCoding.paritytype = pbuf[5];
+    USBD_CDC_LineCoding.datatype = pbuf[6];
     break;
 
   case CDC_GET_LINE_CODING:
-
+    pbuf[0] = (uint8_t)(USBD_CDC_LineCoding.bitrate);
+    pbuf[1] = (uint8_t)(USBD_CDC_LineCoding.bitrate >> 8);
+    pbuf[2] = (uint8_t)(USBD_CDC_LineCoding.bitrate >> 16);
+    pbuf[3] = (uint8_t)(USBD_CDC_LineCoding.bitrate >> 24);
+    pbuf[4] = USBD_CDC_LineCoding.format;
+    pbuf[5] = USBD_CDC_LineCoding.paritytype;
+    pbuf[6] = USBD_CDC_LineCoding.datatype;
     break;
 
   case CDC_SET_CONTROL_LINE_STATE:
@@ -264,7 +279,7 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_HS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 11 */
-  MiniPC_Data_Read(Buf,&Rx_miniPC);
+  MiniPC_Data_Read(Buf, &Rx_miniPC);
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceHS);
   return (USBD_OK);
@@ -282,8 +297,9 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 12 */
-  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-  if (hcdc->TxState != 0){
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef *)hUsbDeviceHS.pClassData;
+  if (hcdc->TxState != 0)
+  {
     return USBD_BUSY;
   }
   USBD_CDC_SetTxBuffer(&hUsbDeviceHS, Buf, Len);

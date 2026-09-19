@@ -6,6 +6,10 @@
 #include "Trans_Task.h"
 
 #define CHASSIS_MAX_SPEED 100
+#define CHASSIS_WHELL_RADIUS 0.076
+#define SIN_45 0.7071
+#define CHASSIS_LX 0.16
+#define CHASSIS_LY 0.22
 
 typedef enum
 {
@@ -53,5 +57,5 @@ void Ctrl_Check(void);
 void Chassis_normal_mode(float Vx, float Vy, float Wz);
 void Chassis_Ctrl(Chassis_Data_t *Chassis_Data_p);
 void Chassis_Mode_Loop(Chassis_Data_t *Chassis_Data_p);
-
+void Chassis_Fwd_solution(Chassis_Motor_t *data,Velocity_t *current_V);
 #endif
