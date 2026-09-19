@@ -77,16 +77,18 @@ first_nav_firmware/
 - 麦克纳姆轮分解公式（`Chassis_normal_mode`）：
 
 ```c
-motor[0] = -Vx - Vy - Wz;
-motor[1] = -Vx + Vy - Wz;
-motor[2] =  Vx - Vy - Wz;
-motor[3] =  Vx + Vy - Wz;
+motor[0] = -Vx + Vy + Wz;
+motor[1] = -Vx - Vy + Wz;
+motor[2] =  Vx - Vy + Wz;
+motor[3] =  Vx + Vy + Wz;
 ```
+
+- **正运动学解算**（`Chassis_Fwd_solution`）：由 4 个麦轮实际转速反解底盘当前速度 `(vx, vy, wz)`，用于向 MiniPC 回传底盘实际速度。
 
 ### 5.2 通信（Trans_Task）
 
 - **遥控接收**：UART5 DMA（`HAL_UARTEx_ReceiveToIdle_DMA`）接收 SBUS 帧，`sbus_to_i6x` 解包，映射到 `ch[6]`（摇杆/旋钮）和 `s[4]`（拨杆），含 `frame_lost` / `failsafe` 标志。
-- **MiniPC 通信**：串口协议帧，接收头 `0x5A`，发送头 `0xA5`，负载结构见 [Trans_Task.h](application/Inc/Trans_Task.h)，带 CRC16 校验；`MiniPC_Data_Read` 支持多帧粘包递归解析。
+- **MiniPC 通信**：串口协议帧，接收头 `0x5A`、尾 `0x5B`，发送头 `0xA5`、尾 `0xB5`，负载结构见 [Trans_Task.h](application/Inc/Trans_Task.h)，带 CRC16 校验；`MiniPC_Data_Read` 支持多帧粘包递归解析，底盘当前速度通过 USB CDC（`MiniPC_Data_Transmit`）回传给 MiniPC。
 
 ### 5.3 姿态解算（IMU_Task）
 
@@ -141,6 +143,29 @@ MiniPC 与底盘之间使用带 CRC16 校验的定长帧，详细字段定义见
 
 - 接收帧（MiniPC → 底盘）：`header(0x5A)` + `Target_V(vx,vy,wz)` + `IMU_lidar(roll,pitch,yaw)` + `timestamp` + `tail` + `checksum`
 - 发送帧（底盘 → MiniPC）：`header(0xA5)` + `Current_V(vx,vy,wz)` + `timestamp` + `tail` + `checksum`
+
+## 9. 更新日志
+
+### 2026-09-19
+
+本次更新完善了底盘运动解算与 MiniPC 回传链路，并修复了 USB 虚拟串口时钟配置问题。
+
+**新增**
+
+- **正运动学解算**：新增 `Chassis_Fwd_solution()`（[Chassis_Task.c](application/Src/Chassis_Task.c)），根据 4 个麦轮实际转速反解底盘当前速度 `(vx, vy, wz)`。
+- **MiniPC 回传链路**：新增 `MiniPC_Data_Send_Process()` / `MiniPC_Data_Transmit()`（[Trans_Task.c](application/Src/Trans_Task.c)），底盘通过 USB CDC 定时向 MiniPC 回传 `Current_V` 数据帧（帧头 `0xA5`、帧尾 `0xB5`，CRC16 校验）。
+- **USB CDC 波特率协商**：新增 `USBD_CDC_LineCoding`，实现 `CDC_SET_LINE_CODING` / `CDC_GET_LINE_CODING` 处理，默认 115200-8-N-1。
+- **底盘常量**：新增车轮半径、`SIN_45`、底盘几何尺寸 `CHASSIS_LX / CHASSIS_LY` 等宏定义（[Chassis_Task.h](application/Inc/Chassis_Task.h)）。
+
+**修改 / 修复**
+
+- **USB 时钟源**：USB 时钟由 PLL 改为 HSI48（48 MHz），修复 USB CDC 无法正常通信的问题（`main.c`、`usbd_conf.c`、`RM_Infantry.ioc`）。
+- **麦轮逆运动学公式**：修正 `Chassis_normal_mode()` 中 4 轮速度分解公式。
+- **遥控方向**：修正 `REMOTE_CTRL` 模式下 `Vy / Wz` 的符号。
+- **静默模式空指针**：`Chassis_Mode_Loop()` 中 `Chassis_Data` → `Chassis_Data_p`，修复未使用入参的问题。
+- **失控保护**：恢复遥控丢帧时底盘电机失能 / 使能逻辑（`Trans_Task.c`）。
+- **电机控制**：`ctrl_dm_motor()` 恢复使用 `Chassis_Data.motor_val[0]`。
+- **IMU 温控任务优先级**：`imuTempCtrl` 优先级由 Low 提升为 AboveNormal（`freertos.c`、`RM_Infantry.ioc`）。
 
 ---
 
